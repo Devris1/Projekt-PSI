@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supercar Vault | Ekskluzywna Baza Maszyn</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">SUPERCAR<span>VAULT</span></div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Szukaj modelu lub marki...">
+            </div>
+            <div class="cart-info">
+                Ulubione: <span id="favCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Znajdź swoją maszynę marzeń</h1>
+            <p>Filtruj, przeglądaj i dodawaj do ulubionych najszybsze auta świata.</p>
+        </section>
+
+        <section id="carGrid" class="car-grid"></section>
+    </main>
+
+    <div id="carModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modalDetails"></div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
