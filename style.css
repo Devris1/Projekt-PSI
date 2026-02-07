@@ -1,124 +1,301 @@
+/* --- ZMIENNE I PODSTAWY --- */
 :root {
-    --primary: #ff4d00; /* Energetyczny pomarańcz */
-    --bg-dark: #0f0f12;
-    --card-bg: #1a1a1f;
-    --text-main: #ffffff;
-    --text-muted: #a0a0a0;
-    --transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --primary: #ff3e3e;
+    --bg: #050505;
+    --card-bg: #121214;
+    --text: #ffffff;
+    --text-dim: #94a3b8;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --header-h: 70px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    font-family: 'Segoe UI', sans-serif;
+body { 
+    background-color: var(--bg); 
+    color: var(--text); 
+    font-family: 'Inter', sans-serif;
     line-height: 1.6;
+    overflow-x: hidden;
+    padding-top: var(--header-h);
 }
 
-/* Nawigacja */
-.navbar {
+h1, h2, h3 { letter-spacing: -0.02em; }
+p { color: var(--text-dim); }
+
+/* --- NAWIGACJA --- */
+header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 5%;
-    background: rgba(0,0,0,0.8);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(10px);
+    padding: 0 5%;
+    height: var(--header-h);
+    background: rgba(10, 10, 12, 0.95);
+    backdrop-filter: blur(15px);
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #222;
 }
 
-.logo { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; }
+.logo { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
 .logo span { color: var(--primary); }
 
-#searchInput {
-    padding: 0.8rem 1.5rem;
-    border-radius: 25px;
-    border: none;
-    background: #2a2a30;
-    color: white;
-    width: 300px;
+.search-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
 }
 
-/* Siatka Grid */
-.car-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2.5rem;
-    padding: 3rem 5%;
-}
-
-/* Karta samochodu */
-.car-card {
-    background: var(--card-bg);
-    border-radius: 15px;
-    overflow: hidden;
-    transition: var(--transition);
-    position: relative;
+.search-box input {
+    padding: 10px 20px;
+    border-radius: 100px;
     border: 1px solid #333;
-}
-
-.car-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 30px rgba(255, 77, 0, 0.2);
-}
-
-.car-card img {
+    background: #1a1a1c;
+    color: white;
     width: 100%;
-    height: 200px;
-    object-fit: cover;
+    max-width: 400px;
+    outline: none;
+    transition: var(--transition);
 }
 
-.car-info { padding: 1.5rem; }
-.car-info h3 { margin-bottom: 0.5rem; }
-.price { color: var(--primary); font-weight: bold; font-size: 1.2rem; }
+.search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 62, 62, 0.2); }
 
-/* Przyciski */
-button {
-    cursor: pointer;
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
-    border: none;
-    transition: 0.3s;
-    margin-top: 1rem;
+.nav-actions { display: flex; align-items: center; gap: 15px; }
+
+.fav-indicator {
+    background: rgba(255, 62, 62, 0.1);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1px solid rgba(255, 62, 62, 0.3);
 }
 
-.btn-details { background: var(--primary); color: white; width: 100%; }
-.btn-fav { background: transparent; border: 1px solid #555; color: white; margin-left: 5px; }
-.btn-fav.active { background: #ff4d00; border-color: #ff4d00; }
-
-/* Modal */
-.modal {
+.menu-toggle {
     display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    z-index: 1000;
+    background: #222;
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
     align-items: center;
     justify-content: center;
 }
 
-.modal-content {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 20px;
-    max-width: 600px;
-    width: 90%;
+/* --- FILTRY KATEGORII --- */
+.categories-wrapper {
+    padding: 20px 5%;
+    display: flex;
+    justify-content: center;
     position: relative;
+    z-index: 500;
 }
 
-.close-modal {
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    font-size: 2rem;
+/* Desktopowe przyciski */
+.categories-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.cat-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: var(--text-dim);
+    padding: 8px 20px;
+    border-radius: 100px;
     cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
 }
 
-/* RWD */
+.cat-btn:hover, .cat-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* --- CUSTOM MOBILE DROPDOWN --- */
+.custom-dropdown {
+    display: none;
+    width: 100%;
+    max-width: 320px;
+    position: relative;
+    user-select: none;
+}
+
+.dropdown-selected {
+    background: #1a1a1c;
+    color: white;
+    padding: 12px 20px;
+    border: 2px solid #333;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.dropdown-selected:after {
+    content: '';
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--primary);
+    transition: transform 0.3s ease;
+}
+
+.custom-dropdown.open .dropdown-selected {
+    border-color: var(--primary);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.custom-dropdown.open .dropdown-selected:after {
+    transform: rotate(180deg);
+}
+
+.dropdown-options {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    background: #1a1a1c;
+    border: 2px solid var(--primary);
+    border-top: none;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.custom-dropdown.open .dropdown-options {
+    display: block;
+}
+
+.dropdown-option {
+    padding: 12px 20px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.95rem;
+    border-top: 1px solid #222;
+}
+
+.dropdown-option:hover {
+    background: #252528;
+    color: white;
+}
+
+.dropdown-option.active {
+    color: var(--primary);
+    background: rgba(255, 62, 62, 0.05);
+    font-weight: 700;
+}
+
+/* --- SIATKA I KARTY --- */
+main { padding: 1rem 5% 4rem; }
+.section-header { margin-bottom: 2rem; text-align: center; }
+.section-header h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.car-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid #222;
+    display: flex; flex-direction: column; position: relative;
+}
+
+.car-card:hover { border-color: #444; transform: translateY(-5px); }
+
+.image-wrapper { width: 100%; display: flex; align-items: center; justify-content: center; }
+.car-card img { width: 100%; height: auto; display: block; transition: 0.5s; cursor: pointer; }
+
+.car-info { padding: 1.25rem; flex-grow: 1; display: flex; flex-direction: column; }
+.car-cat-label { font-size: 0.65rem; color: var(--primary); font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
+.car-info h3 { font-size: 1.25rem; margin-bottom: 6px; font-weight: 700; }
+.price-tag { font-size: 1rem; font-weight: 700; margin-top: auto; color: #fff; padding-top: 8px; }
+
+.fav-icon-btn {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 10;
+}
+.fav-icon-btn.active { color: var(--primary); background: rgba(255,62,62,0.15); border-color: var(--primary); }
+
+.details-btn {
+    margin-top: 12px;
+    background: #222; color: white;
+    border: 1px solid #333;
+    padding: 10px; border-radius: 12px;
+    font-weight: 600; cursor: pointer;
+}
+
+/* --- MODAL --- */
+.modal {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 2000;
+    justify-content: center; align-items: center;
+    padding: 15px; backdrop-filter: blur(12px);
+}
+
+.modal-content {
+    background: #0f0f11;
+    max-width: 900px; width: 100%;
+    max-height: 90vh; border-radius: 24px;
+    position: relative;
+    display: flex; flex-direction: row;
+    overflow-y: auto; border: 1px solid #222;
+}
+
+.modal-image-container { flex: 1.2; display: flex; align-items: center; justify-content: center; padding: 10px; }
+.modal-image-container img { max-width: 100%; max-height: 70vh; border-radius: 12px; object-fit: contain; }
+.modal-info-container { flex: 1; padding: 30px; display: flex; flex-direction: column; justify-content: center; }
+
+.modal-close {
+    position: absolute; top: 15px; right: 15px;
+    background: rgba(0,0,0,0.5); color: white; border: none;
+    width: 35px; height: 35px; border-radius: 50%;
+    cursor: pointer; z-index: 30; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* --- MEDIA QUERIES --- */
+@media (max-width: 850px) {
+    .modal-content { flex-direction: column; }
+    .search-container { display: none; }
+    .menu-toggle { display: flex; }
+}
+
 @media (max-width: 768px) {
-    .navbar { flex-direction: column; gap: 1rem; }
-    #searchInput { width: 100%; }
+    .categories-buttons { display: none; }
+    .custom-dropdown { display: block; }
+}
+
+@media (max-width: 480px) {
+    .logo { font-size: 1rem; }
+    .fav-indicator { font-size: 0.75rem; padding: 4px 10px; }
 }

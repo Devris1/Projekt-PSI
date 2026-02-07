@@ -1,100 +1,99 @@
-import cars from './data.js';
+let favorites = JSON.parse(localStorage.getItem('myFavs')) || [];
+let currentCategory = "Wszystkie";
+let searchTerm = "";
 
-const carGrid = document.getElementById('carGrid');
-const searchInput = document.getElementById('searchInput');
-const favCountSpan = document.getElementById('favCount');
-const modal = document.getElementById('carModal');
-const modalDetails = document.getElementById('modalDetails');
-const closeModal = document.querySelector('.close-modal');
+// --- OBSŁUGA DROPDOWN ---
+function toggleDropdown() {
+    document.getElementById('mobile-dropdown').classList.toggle('open');
+}
 
-// 1. DYNAMICZNE RENDEROWANIE
-function renderCars(data) {
-    carGrid.innerHTML = '';
+function selectDropdown(cat, label) {
+    document.querySelector('.dropdown-selected').innerText = label;
+    document.getElementById('mobile-dropdown').classList.remove('open');
     
-    // Pobieramy listę ulubionych z LocalStorage, aby wiedzieć, które przyciski zaznaczyć
-    const favorites = JSON.parse(localStorage.getItem('favCars')) || [];
+    document.querySelectorAll('.dropdown-option').forEach(opt => {
+        opt.classList.toggle('active', opt.innerText === cat || (cat === "Wszystkie" && opt.innerText === "Wszystkie"));
+    });
 
-    data.forEach(car => {
+    changeCategory(cat);
+}
+
+// Zamykanie dropdowna po kliknięciu poza nim
+window.addEventListener('click', (e) => {
+    if (!document.getElementById('mobile-dropdown').contains(e.target)) {
+        document.getElementById('mobile-dropdown').classList.remove('open');
+    }
+});
+
+function changeCategory(cat) {
+    currentCategory = cat;
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-category') === cat);
+    });
+    render();
+}
+
+function syncSearch(input) {
+    searchTerm = input.value.toLowerCase();
+    document.querySelectorAll('.search-input').forEach(i => i.value = input.value);
+    render();
+}
+
+function toggleMobileSearch() {
+    const bar = document.getElementById('mobile-search-bar');
+    bar.style.display = bar.style.display === 'none' ? 'block' : 'none';
+}
+
+function render() {
+    const container = document.getElementById('car-container');
+    const filtered = carData.filter(car => {
+        const matchesCat = currentCategory === "Wszystkie" || car.category === currentCategory;
+        const matchesSearch = car.brand.toLowerCase().includes(searchTerm) || car.model.toLowerCase().includes(searchTerm);
+        return matchesCat && matchesSearch;
+    });
+
+    container.innerHTML = '';
+    filtered.forEach(car => {
         const isFav = favorites.includes(car.id);
-        const card = document.createElement('article');
-        card.className = 'car-card';
-        card.innerHTML = `
-            <img src="${car.image}" alt="${car.brand} ${car.model}">
+        const article = document.createElement('article');
+        article.className = 'car-card';
+        article.innerHTML = `
+            <button class="fav-icon-btn ${isFav ? 'active' : ''}" onclick="toggleFav(${car.id})">${isFav ? '❤️' : '🤍'}</button>
+            <div class="image-wrapper"><img src="${car.img}" onclick="showDetails(${car.id})"></div>
             <div class="car-info">
+                <span class="car-cat-label">${car.category}</span>
                 <h3>${car.brand} ${car.model}</h3>
-                <p>${car.engine} | ${car.power}</p>
-                <p class="price">${car.price}</p>
-                <button class="btn-details" data-id="${car.id}">Szczegóły</button>
-                <button class="btn-fav ${isFav ? 'active' : ''}" data-id="${car.id}">
-                    ${isFav ? '❤ Ulubiony' : '♡ Do ulubionych'}
-                </button>
+                <p class="price-tag">${car.price}</p>
+                <button class="details-btn" onclick="showDetails(${car.id})">Szczegóły</button>
             </div>
         `;
-        carGrid.appendChild(card);
+        container.appendChild(article);
     });
+    document.getElementById('fav-count').innerText = favorites.length;
 }
 
-// 2. WYSZUKIWARKA W CZASIE RZECZYWISTYM
-searchInput.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = cars.filter(car => 
-        car.brand.toLowerCase().includes(term) || 
-        car.model.toLowerCase().includes(term)
-    );
-    renderCars(filtered);
+document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => changeCategory(btn.getAttribute('data-category')));
 });
 
-// 3. OBSŁUGA KLIKNIĘĆ (Delegacja zdarzeń)
-carGrid.addEventListener('click', (e) => {
-    const id = parseInt(e.target.dataset.id);
-    
-    if (e.target.classList.contains('btn-details')) {
-        openModal(id);
-    }
-    
-    if (e.target.classList.contains('btn-fav')) {
-        toggleFavorite(id);
-    }
-});
+function toggleFav(id) {
+    if(favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+    else favorites.push(id);
+    localStorage.setItem('myFavs', JSON.stringify(favorites));
+    render();
+}
 
-// 4. MODAL (POP-UP)
-function openModal(id) {
-    const car = cars.find(c => c.id === id);
-    modalDetails.innerHTML = `
+function showDetails(id) {
+    const car = carData.find(c => c.id === id);
+    document.getElementById('modal-body-img').innerHTML = `<img src="${car.img}">`;
+    document.getElementById('modal-body-info').innerHTML = `
+        <span class="car-cat-label">${car.category}</span>
         <h2>${car.brand} ${car.model}</h2>
-        <img src="${car.image}" style="width:100%; border-radius:10px; margin: 15px 0;">
-        <p><strong>Silnik:</strong> ${car.engine}</p>
-        <p><strong>Moc:</strong> ${car.power}</p>
-        <p><strong>V-Max:</strong> ${car.topSpeed}</p>
-        <p style="margin-top: 15px;">${car.description}</p>
-        <p class="price" style="margin-top: 15px;">Cena: ${car.price}</p>
+        <p style="margin:10px 0; color:var(--primary); font-weight:bold;">${car.hp} KM | ${car.price}</p>
+        <p>${car.desc}</p>
     `;
-    modal.style.display = 'flex';
+    document.getElementById('modal').style.display = 'flex';
 }
 
-closeModal.onclick = () => modal.style.display = 'none';
-window.onclick = (e) => { if(e.target == modal) modal.style.display = 'none'; };
-
-// 5. LOCAL STORAGE (Ulubione)
-function toggleFavorite(id) {
-    let favorites = JSON.parse(localStorage.getItem('favCars')) || [];
-    
-    if (favorites.includes(id)) {
-        favorites = favorites.filter(favId => favId !== id);
-    } else {
-        favorites.push(id);
-    }
-    
-    localStorage.setItem('favCars', JSON.stringify(favorites));
-    updateFavCount();
-    renderCars(cars); // Odświeżamy widok, by zmienić ikony serc
-}
-
-function updateFavCount() {
-    const favorites = JSON.parse(localStorage.getItem('favCars')) || [];
-    favCountSpan.innerText = favorites.length;
-}
-
-// Inicjalizacja
-renderCars(cars);
-updateFavCount();
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+render();

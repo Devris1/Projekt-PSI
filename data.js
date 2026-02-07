@@ -1,48 +1,8 @@
-const cars = [
-    {
-        id: 1,
-        brand: "Lamborghini",
-        model: "Revuelto",
-        engine: "6.5L V12 Hybrid",
-        power: "1015 KM",
-        topSpeed: "350 km/h",
-        price: "2 500 000 PLN",
-        image: "https://images.unsplash.com/photo-1678911820864-e2c567c655d7?w=600",
-        description: "Pierwszy hybrydowy supersamochód V12 od Lamborghini, łączący tradycyjną moc z nowoczesną technologią elektryczną."
-    },
-    {
-        id: 2,
-        brand: "Ferrari",
-        model: "SF90 Stradale",
-        engine: "4.0L V8 Turbo Hybrid",
-        power: "1000 KM",
-        topSpeed: "340 km/h",
-        price: "2 200 000 PLN",
-        image: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=600",
-        description: "Szczyt osiągnięć Ferrari – napęd na cztery koła i przyspieszenie, które wgniata w fotel."
-    },
-    {
-        id: 3,
-        brand: "Bugatti",
-        model: "Chiron Super Sport",
-        engine: "8.0L W16 Quadturbo",
-        power: "1600 KM",
-        topSpeed: "440 km/h",
-        price: "15 000 000 PLN",
-        image: "https://images.unsplash.com/photo-1627454820516-dc767bc4b3f8?w=600",
-        description: "Luksus spotyka się z ekstremalną prędkością. Chiron to legenda inżynierii motoryzacyjnej."
-    },
-    {
-        id: 4,
-        brand: "Porsche",
-        model: "911 GT3 RS",
-        engine: "4.0L Boxer",
-        power: "525 KM",
-        topSpeed: "296 km/h",
-        price: "1 200 000 PLN",
-        image: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=600",
-        description: "Król torów wyścigowych dopuszczony do ruchu ulicznego. Aerodynamika na najwyższym poziomie."
-    }
+const carData = [
+    { id: 1, category: "Hybrydy", brand: "Lamborghini", model: "Revuelto", hp: 1015, price: "2.5M PLN", img: "https://images.unsplash.com/photo-1621135802920-133df287f89c?w=800", desc: "Najnowsza hybryda V12, która definiuje przyszłość marki Lamborghini." },
+    { id: 2, category: "Hybrydy", brand: "Ferrari", model: "SF90", hp: 1000, price: "2.2M PLN", img: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800", desc: "Włoskie dzieło sztuki z napędem hybrydowym plug-in." },
+    { id: 3, category: "Spalinowe", brand: "Bugatti", model: "Chiron", hp: 1500, price: "12M PLN", img: "https://images.unsplash.com/photo-1689826493949-5e5824a5474e?w=800", desc: "Król prędkości i luksusu. Silnik W16 to szczyt inżynierii." },
+    { id: 4, category: "Torowe", brand: "Porsche", model: "GT3 RS", hp: 525, price: "1.2M PLN", img: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800", desc: "Precyzja torowa przeniesiona na drogi." },
+    { id: 5, category: "Spalinowe", brand: "McLaren", model: "600LT", hp: 600, price: "1M PLN", img: "https://images.unsplash.com/photo-1615394695852-da39a8df9bf1?w=800", desc: "Lekkość i aerodynamika zredukowana do perfekcji." },
+    { id: 6, category: "Torowe", brand: "Koenigsegg", model: "Jesko", hp: 1600, price: "15M PLN", img: "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=800", desc: "Absolutny szczyt inżynierii szwedzkiego wizjonera." }
 ];
-
-export default cars;
