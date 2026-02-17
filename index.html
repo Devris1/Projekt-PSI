@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supercar Vault | Kolekcja Marzeń</title>
-    <!-- Import czcionki Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- Link do pliku ze stylami -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -29,15 +27,13 @@
     </div>
 
     <div class="categories-wrapper">
-        <!-- Widok Desktop -->
         <div class="categories-buttons">
             <button class="cat-btn active" data-category="Wszystkie">Wszystkie</button>
             <button class="cat-btn" data-category="Spalinowe">Spalinowe</button>
             <button class="cat-btn" data-category="Hybrydy">Hybrydy</button>
             <button class="cat-btn" data-category="Torowe">Torowe</button>
         </div>
-        
-        <!-- Widok Mobilny (Custom Dropdown) -->
+
         <div class="custom-dropdown" id="mobile-dropdown">
             <div class="dropdown-selected" onclick="toggleDropdown()">Kategoria: Wszystkie</div>
             <div class="dropdown-options">
@@ -65,7 +61,6 @@
         </div>
     </div>
 
-    <!-- Skrypty JS (Kolejność jest ważna: najpierw dane, potem logika) -->
     <script src="data.js"></script>
     <script src="app.js"></script>
 </body>
