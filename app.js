@@ -2,36 +2,30 @@ let favorites = JSON.parse(localStorage.getItem('myFavs')) || [];
 let currentCategory = "Wszystkie";
 let searchTerm = "";
 
-// --- OBSŁUGA DROPDOWN (Menu mobilne) ---
+
+const imageCache = new Map();
+
 function toggleDropdown() {
-    const dropdown = document.getElementById('mobile-dropdown');
-    dropdown.classList.toggle('open');
+    document.getElementById('mobile-dropdown')?.classList.toggle('open');
 }
 
 function selectDropdown(cat, label) {
     document.querySelector('.dropdown-selected').innerText = label;
     document.getElementById('mobile-dropdown').classList.remove('open');
-    
-    document.querySelectorAll('.dropdown-option').forEach(opt => {
-        opt.classList.toggle('active', opt.innerText === cat || (cat === "Wszystkie" && opt.innerText === "Wszystkie"));
-    });
-
     changeCategory(cat);
 }
 
-window.addEventListener('click', (e) => {
+window.addEventListener('click', e => {
     const dropdown = document.getElementById('mobile-dropdown');
     if (dropdown && !dropdown.contains(e.target)) {
         dropdown.classList.remove('open');
     }
 });
 
-// --- LOGIKA GŁÓWNA ---
-
 function changeCategory(cat) {
     currentCategory = cat;
     document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-category') === cat);
+        btn.classList.toggle('active', btn.dataset.category === cat);
     });
     render();
 }
@@ -47,44 +41,66 @@ function toggleMobileSearch() {
     bar.style.display = bar.style.display === 'none' ? 'block' : 'none';
 }
 
+async function preloadImages() {
+    for (const car of carData) {
+        if (imageCache.has(car.img)) continue;
+
+        const res = await fetch(car.img, { cache: 'force-cache' });
+        const blob = await res.blob();
+        const bitmap = await createImageBitmap(blob);
+
+        imageCache.set(car.img, bitmap);
+    }
+}
+
 function render() {
     const container = document.getElementById('car-container');
-    
-    const filtered = carData.filter(car => {
-        const matchesCat = currentCategory === "Wszystkie" || car.category === currentCategory;
-        const matchesSearch = car.brand.toLowerCase().includes(searchTerm) || car.model.toLowerCase().includes(searchTerm);
-        return matchesCat && matchesSearch;
+
+    // Jeśli karty jeszcze nie istnieją – tworzymy je tylko raz
+    if (!container.dataset.initialized) {
+        carData.forEach(car => {
+            const article = document.createElement('article');
+            article.className = 'car-card';
+            article.dataset.category = car.category;
+            article.dataset.brand = car.brand.toLowerCase();
+            article.dataset.model = car.model.toLowerCase();
+            article.dataset.id = car.id;
+
+            const isFav = favorites.includes(car.id);
+
+            article.innerHTML = `
+                <button type="button"
+                    id="fav-btn-${car.id}"
+                    class="fav-icon-btn ${isFav ? 'active' : ''}"
+                    onclick="event.stopPropagation(); toggleFav(${car.id})">
+                    ${isFav ? '❤️' : '🤍'}
+                </button>
+                <div class="image-wrapper" onclick="showDetails(${car.id})">
+                    <img src="${car.img}" alt="${car.alt || car.model}" loading="lazy">
+                </div>
+                <div class="car-info">
+                    <span class="car-cat-label">${car.category}</span>
+                    <h3>${car.brand} ${car.model}</h3>
+                    <p class="price-tag">${car.price}</p>
+                    <button type="button" class="details-btn" onclick="showDetails(${car.id})">Szczegóły</button>
+                </div>
+            `;
+
+            container.appendChild(article);
+        });
+
+        container.dataset.initialized = 'true';
+    }
+
+    document.querySelectorAll('.car-card').forEach(card => {
+        const matchesCat = currentCategory === 'Wszystkie' || card.dataset.category === currentCategory;
+        const matchesSearch =
+            card.dataset.brand.includes(searchTerm) ||
+            card.dataset.model.includes(searchTerm);
+
+        card.style.display = matchesCat && matchesSearch ? '' : 'none';
     });
 
-    container.innerHTML = '';
-    
-    filtered.forEach(car => {
-        const isFav = favorites.includes(car.id);
-        const article = document.createElement('article');
-        article.className = 'car-card';
-        
-        // Dodano id do przycisku ulubionych, aby móc go łatwo znaleźć bez przerysowania całości
-        article.innerHTML = `
-            <button type="button" 
-                    id="fav-btn-${car.id}"
-                    class="fav-icon-btn ${isFav ? 'active' : ''}" 
-                    onclick="event.stopPropagation(); toggleFav(${car.id})" 
-                    title="${isFav ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}">
-                ${isFav ? '❤️' : '🤍'}
-            </button>
-            <div class="image-wrapper">
-                <img src="${car.img}" alt="${car.alt || car.model}" onclick="showDetails(${car.id})">
-            </div>
-            <div class="car-info">
-                <span class="car-cat-label">${car.category}</span>
-                <h3>${car.brand} ${car.model}</h3>
-                <p class="price-tag">${car.price}</p>
-                <button type="button" class="details-btn" onclick="showDetails(${car.id})">Szczegóły</button>
-            </div>
-        `;
-        container.appendChild(article);
-    });
-    
     updateFavCounter();
 }
 
@@ -93,31 +109,22 @@ function updateFavCounter() {
     if (counter) counter.innerText = favorites.length;
 }
 
-// Obsługa przycisków kategorii na desktopie
-document.querySelectorAll('.cat-btn').forEach(btn => {
-    btn.addEventListener('click', () => changeCategory(btn.getAttribute('data-category')));
-});
-
-// --- FUNKCJE AKCJI ---
-
 function toggleFav(id) {
     const index = favorites.indexOf(id);
     const isAdding = index === -1;
 
-    if(isAdding) {
+    if (isAdding) {
         favorites.push(id);
     } else {
         favorites.splice(index, 1);
     }
-    
+
     localStorage.setItem('myFavs', JSON.stringify(favorites));
-    
-    // Zamiast render(), aktualizujemy tylko konkretny przycisk w DOM
+
     const btn = document.getElementById(`fav-btn-${id}`);
     if (btn) {
         btn.classList.toggle('active', isAdding);
         btn.innerHTML = isAdding ? '❤️' : '🤍';
-        btn.title = isAdding ? 'Usuń z ulubionych' : 'Dodaj do ulubionych';
     }
 
     updateFavCounter();
@@ -127,18 +134,60 @@ function showDetails(id) {
     const car = carData.find(c => c.id === id);
     if (!car) return;
 
-    document.getElementById('modal-body-img').innerHTML = `<img src="${car.img}" alt="${car.alt || car.model}">`;
-    document.getElementById('modal-body-info').innerHTML = `
+    const imgContainer = document.getElementById('modal-body-img');
+    const infoContainer = document.getElementById('modal-body-info');
+
+    imgContainer.innerHTML = '';
+
+    const bitmap = imageCache.get(car.img);
+
+    if (bitmap) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const containerWidth = imgContainer.clientWidth || 600;
+        const aspect = bitmap.width / bitmap.height;
+
+        canvas.width = containerWidth;
+        canvas.height = Math.round(containerWidth / aspect);
+
+        // Zachowanie jakości
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
+        canvas.style.display = 'block';
+
+        imgContainer.appendChild(canvas);
+    }
+
+    infoContainer.innerHTML = `
         <span class="car-cat-label">${car.category}</span>
         <h2>${car.brand} ${car.model}</h2>
-        <p style="margin:10px 0; color:var(--primary); font-weight:bold;">${car.hp} KM | ${car.price}</p>
+        <p style="margin:10px 0; font-weight:bold;">${car.hp} KM | ${car.price}</p>
         <p>${car.desc}</p>
     `;
+
     document.getElementById('modal').style.display = 'flex';
 }
 
-function closeModal() { 
-    document.getElementById('modal').style.display = 'none'; 
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
 }
 
-render();
+(async () => {
+    await preloadImages();
+
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cat = btn.dataset.category;
+            if (cat && cat !== currentCategory) {
+                changeCategory(cat);
+            }
+        });
+    });
+
+    render();
+})();
